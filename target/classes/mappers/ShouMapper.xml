@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhangzhenjiang.cms.mapper.ShouMapper">
+	<select id="getShouListByUid" resultType="map">
+		SELECT * FROM cms_shou cs LEFT JOIN cms_article ca ON cs.aid=ca.id WHERE cs.uid=${uid}
+	</select>
+	<select id="isShou" resultType="Shou">
+		select * from cms_shou where aid=${aid} and uid=${uid}
+	</select>
+	<insert id="insertShou">
+		insert into cms_shou (stime,uid,aid) values(now(),${uid},${aid})
+	</insert>
+	<delete id="delShou">
+		delete from cms_shou where aid=${aid} and uid=${uid}
+	</delete>
+</mapper>

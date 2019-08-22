@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhangzhenjiang.cms.mapper.ArticleMapper">
+	<select id="selectListByCIdCatId" resultType="map">
+		select a.*,u.username,c.name,cat.name as catname from cms_article a left join
+		cms_user u on a.user_id =u.id LEFT JOIN cms_channel c ON a.channel_id=c.id LEFT JOIN cms_category cat ON a.category_id=cat.id and a.status =1
+		<where>
+			<if test="cid!=null and cid!=''">
+				a.channel_id = #{cid}
+			</if>
+			<if test="catId!=null and catId!=''">
+				and a.category_id = #{catId}
+			</if>
+		</where>
+		order by created desc
+	</select>
+	<select id="listByUserId" resultType="map">
+		select * from cms_article where user_id =#{userId} order by created desc
+	</select>
+	<select id="get" resultType="map">
+		select * from cms_article where id=#{id}
+	</select>
+	<select id="selectList" resultType="map">
+	select a.*,u.username,c.name,cat.name from cms_article a left join
+	cms_user u on a.user_id =u.id LEFT JOIN cms_channel c on
+	a.channel_id =c.id LEFT JOIN cms_category cat on a.category_id =cat.id
+	<where>
+		<if test="status !=null and status != ''">
+			status=#{status}
+		</if>
+	</where>
+	</select>
+	<select id="selectHotList" resultType="map">
+		select a.*,u.username from cms_article a left join
+		cms_user u on a.user_id =u.id
+		where hot=1 and status=1 AND CONCAT(a.title,a.title) LIKE '%${titleorcontent}%'
+		order by created desc
+	</select>
+	<select id="selectListByCId" resultType="map">
+	select a.*,u.username from cms_article a left join
+	cms_user u on a.user_id =u.id
+	where a.channel_id = #{cid} and status=1
+	order by created desc
+	</select>
+	<select id="selectListByCatId" resultType="map">
+	select a.*,u.username from cms_article a left join
+	cms_user u on a.user_id =u.id
+	where a.category_id = #{catid} and status=1
+	order by created desc
+	</select>
+	<insert id="insert">
+	<!-- 返回插入数据的主键ID -->
+	<selectKey order="AFTER" keyProperty="id" resultType="int">
+		select last_insert_id();
+	</selectKey>
+		insert into cms_article
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="title != null">
+				title,
+			</if>
+			<if test="picture != null">
+				picture,
+			</if>
+			<if test="channelId != null">
+				channel_id,
+			</if>
+			<if test="categoryId != null">
+				category_id,
+			</if>
+			<if test="userId != null">
+				user_id,
+			</if>
+			<if test="hits != null">
+				hits,
+			</if>
+			<if test="hot != null">
+				hot,
+			</if>
+			<if test="keywords != null">
+				keywords,
+			</if>
+			<if test="original!= null">
+				original,
+			</if>
+			status,
+			deleted,
+			created,
+			updated,
+			<if test="content != null">
+				content,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="title != null">
+				#{title,jdbcType=VARCHAR},
+			</if>
+			<if test="picture != null">
+				#{picture,jdbcType=VARCHAR},
+			</if>
+			<if test="channelId != null">
+				#{channelId,jdbcType=INTEGER},
+			</if>
+			<if test="categoryId != null">
+				#{categoryId,jdbcType=INTEGER},
+			</if>
+			<if test="userId != null">
+				#{userId,jdbcType=INTEGER},
+			</if>
+			<if test="hits != null">
+				#{hits,jdbcType=INTEGER},
+			</if>
+			<if test="hot != null">
+				#{hot,jdbcType=INTEGER},
+			</if>
+			<if test="keywords != null">
+				#{keywords},
+			</if>
+			<if test="original!= null">
+				#{original},
+			</if>
+			0,
+			0,
+			now(),
+			now(),
+			<if test="content != null">
+				#{content,jdbcType=LONGVARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" >
+    update cms_article
+    <set >
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="picture != null" >
+        picture = #{picture,jdbcType=VARCHAR},
+      </if>
+      <if test="channelId != null" >
+        channel_id = #{channelId,jdbcType=INTEGER},
+      </if>
+      <if test="categoryId != null" >
+        category_id = #{categoryId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="hits != null" >
+        hits = #{hits,jdbcType=INTEGER},
+      </if>
+      <if test="hot != null" >
+        hot = #{hot,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="deleted != null" >
+        deleted = #{deleted,jdbcType=INTEGER},
+      </if>
+      <if test="updated != null" >
+        updated = now(),
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectArticleByAid" resultType="Article">
+  	select * from cms_article where id=#{aid}
+  </select>
+  <insert id="incrHits">
+  	UPDATE cms_article SET hits=hits+1 WHERE id=${aid}
+  </insert>
+  <select id="getNewsArticle" resultType="Article">
+  	SELECT * FROM cms_article ORDER BY created DESC LIMIT 0,4
+  </select>
+  <delete id="delnew">
+  	delete from cms_article where id=${nid}
+  </delete>
+</mapper>

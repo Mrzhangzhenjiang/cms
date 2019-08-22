@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhangzhenjiang.cms.mapper.HistoryMapper">
+	<select id="getHistoryListByUid" resultType="map">
+		SELECT * from cms_history ch LEFT JOIN cms_article ca ON ch.aid=ca.id WHERE ch.uid=${uid} order by ch.htime
+	</select>
+	<select id="isHistory" resultType="History">
+		select * from cms_history where uid=${uid} and aid=${aid}
+	</select>
+	<insert id="insertHistory">
+		insert into cms_history (htime,uid,aid) values(now(),${uid},${aid})
+	</insert>
+	<update id="updateHtime">
+		update cms_history set htime=now() where uid=${uid} and aid=${aid}
+	</update>
+</mapper>

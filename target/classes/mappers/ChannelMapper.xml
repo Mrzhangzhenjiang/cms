@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhangzhenjiang.cms.mapper.ChannelMapper">
+
+	<!-- redis会自动的将Sql+条件+Hash等当做key值，而将查询结果作为value，只有请求中的所有参数都符合，那么就会使用redis中的二级缓存 -->
+	<!-- <cache eviction="LRU" readOnly="false" type="com.zhangzhenjiang.cms.redis.RedisCache"></cache> -->
+	
+	<resultMap type="channel" id="channelMap">
+		<result property="id" column="id"/>
+		<result property="name" column="name"/>
+		<collection property="categories" ofType="category" column="channel_id">
+			<result property="id" column="cid"/>
+			<result property="name" column="cname"/>
+		</collection>
+	</resultMap>
+	<select id="getListChannel" resultMap="channelMap">
+		SELECT channel.*,category.id AS cid,category.`name` AS cname FROM cms_channel channel LEFT JOIN 
+		cms_category category ON channel.id=category.channel_id ORDER BY channel.id ASC
+	</select>
+	
+	<resultMap type="category" id="categoryMap">
+		<result property="id" column="id"/>
+		<result property="name" column="name"/>
+		<association property="channel" javaType="Channel">
+			<id property="id" column="channel_id"/>
+			<result property="id" column="cid"/>
+			<result property="name" column="cname"/>
+			<result property="icon" column="icon"/>
+			<result property="description" column="description"/>
+		</association>
+	</resultMap>
+	<select id="getCategoryList" resultMap="categoryMap">
+		SELECT category.*,channel.id AS cid,channel.`name` AS cname,channel.icon,channel.description FROM cms_category category LEFT JOIN 
+		cms_channel channel ON category.channel_id=channel.id where channel.id=${cid} ORDER BY category.id
+	</select>
+</mapper>

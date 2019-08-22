@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhangzhenjiang.cms.mapper.CommentMapper">
+	<insert id="addComment">
+		insert into cms_comment (ccontent,ctime,aid,uid) values(#{ccontent},now(),${aid},${uid})
+	</insert>
+	<select id="getCommentListByAid" resultType="map">
+		SELECT c.*,u.username FROM cms_comment c LEFT JOIN cms_user u ON c.uid=u.id 
+		<where>
+			<if test="aid != null and aid != ''">
+				c.aid=${aid}
+			</if>
+			<if test="uid != null and uid!= ''">
+				and u.id=${uid} 
+			</if>
+		</where> 
+		ORDER BY c.ctime DESC
+	</select>
+	<delete id="delComment">
+		delete from cms_comment where cid=${cid}
+	</delete>
+</mapper>
